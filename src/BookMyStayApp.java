@@ -78,17 +78,23 @@ public class BookMyStayApp {
         public int getAvailability(String roomType) {
             return inventory.getOrDefault(roomType, 0);
         }
+    }
 
-        public void updateAvailability(String roomType, int newCount) {
-            if (inventory.containsKey(roomType)) {
-                inventory.put(roomType, newCount);
-            }
+    static class SearchService {
+        private RoomInventory inventory;
+
+        public SearchService(RoomInventory inventory) {
+            this.inventory = inventory;
         }
 
-        public void displayInventory() {
-            System.out.println("Current Inventory:");
-            for (String type : inventory.keySet()) {
-                System.out.println(type + " -> Available: " + inventory.get(type));
+        public void searchAvailableRooms(Room[] rooms) {
+            System.out.println("Available Rooms:");
+            for (Room room : rooms) {
+                int availability = inventory.getAvailability(room.getRoomType());
+                if (availability > 0) {
+                    room.displayDetails();
+                    System.out.println("Available: " + availability);
+                }
             }
         }
     }
@@ -100,18 +106,10 @@ public class BookMyStayApp {
 
         RoomInventory inventory = new RoomInventory();
         inventory.addRoomType(single.getRoomType(), 5);
-        inventory.addRoomType(doubleR.getRoomType(), 3);
+        inventory.addRoomType(doubleR.getRoomType(), 0);
         inventory.addRoomType(suite.getRoomType(), 2);
 
-        single.displayDetails();
-        System.out.println("Available: " + inventory.getAvailability(single.getRoomType()));
-
-        doubleR.displayDetails();
-        System.out.println("Available: " + inventory.getAvailability(doubleR.getRoomType()));
-
-        suite.displayDetails();
-        System.out.println("Available: " + inventory.getAvailability(suite.getRoomType()));
-
-        inventory.displayInventory();
+        SearchService searchService = new SearchService(inventory);
+        searchService.searchAvailableRooms(new Room[]{single, doubleR, suite});
     }
 }
